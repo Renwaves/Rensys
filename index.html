@@ -1,0 +1,1340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Rensys v1.1 free solar PV yield simulator. Estimate annual yield, specific yield, performance ratio, and monthly production.">
+<title>Rensys — Free Solar PV Yield Simulator</title>
+</head>
+<body>
+<style data-wp-block-html="css">
+/* Rensys hero. Unique class names (rensys-hero-*) so nothing clashes with other page styles.
+   Page-scoped: add only on the Rensys page. */
+
+/* Hide the theme's duplicate title band */
+.hero-section, .entry-hero, .page-header, header.entry-header { display: none !important; }
+
+.entry-content.single-content, .entry-content, article,
+.content-wrap, .main-content, #content, #primary, .site-main {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+html { scroll-behavior: smooth; }
+
+.rensys-hero {
+  /* Hero image */
+  --rensys-hero-image: url('https://renwaves.com/wp-content/uploads/2026/10/solar-yield-at-golden-hour.webp');
+
+  --green: #5FA63A;
+  --green-hover: #6DBE45;
+  --green-bright: #8CE05B;
+  --dark: #1f2937;
+  --white: #ffffff;
+  --sans: 'Inter', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: calc(100vw - 70px);
+  margin-left: calc(50% - 50vw + 35px);
+  min-height: max(100vh, 740px);
+  overflow: hidden;
+  box-sizing: border-box;
+  font-family: var(--sans);
+  background: linear-gradient(135deg, #030f23 0%, #0f2a3a 60%, #14433a 100%);
+}
+
+.rensys-hero *, .rensys-hero *::before, .rensys-hero *::after { box-sizing: border-box; }
+
+.rensys-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image: var(--rensys-hero-image);
+  background-size: cover;
+  background-position: center 40%;
+  background-repeat: no-repeat;
+}
+
+.rensys-hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(105deg, rgba(3,15,35,0.94) 0%, rgba(3,15,35,0.85) 40%, rgba(3,15,35,0.50) 75%, rgba(3,15,35,0.20) 100%);
+}
+
+.rensys-hero-inner {
+  position: relative;
+  z-index: 2;
+  width: min(1320px, 100% - 64px);
+  margin: 0 auto;
+  padding: 140px 0 100px;
+}
+
+.rensys-hero-copy { color: var(--white); max-width: 720px; }
+
+.rensys-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  backdrop-filter: blur(12px);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.rensys-hero-title {
+  margin: 0 0 28px 0 !important;
+  padding: 0 !important;
+  font-family: var(--sans);
+  font-size: clamp(48px, 6vw, 84px);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--white);
+}
+
+.rensys-hero-ghost { color: var(--white); }
+.rensys-hero-accent { color: var(--green-bright); text-shadow: 0 0 30px rgba(140,224,91,0.4); }
+
+.rensys-hero-sub {
+  margin: 0 0 36px 0;
+  max-width: 620px;
+  font-size: 19px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.88);
+}
+
+.rensys-hero-cta { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 40px; }
+
+.rensys-hero-btn, .rensys-hero-ghostbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 28px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  transition: all 0.3s ease;
+}
+
+.rensys-hero-btn {
+  border: 1px solid var(--green);
+  background: var(--green);
+  box-shadow: 0 12px 32px rgba(95,166,58,0.35);
+}
+
+.rensys-hero-btn:hover {
+  background: var(--green-hover);
+  border-color: var(--green-hover);
+  color: var(--white);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(95,166,58,0.45);
+}
+
+.rensys-hero-ghostbtn {
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+}
+
+.rensys-hero-ghostbtn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: var(--green-bright);
+  color: var(--white);
+  transform: translateY(-4px);
+}
+
+.rensys-hero-meta { display: flex; flex-wrap: wrap; gap: 12px 28px; }
+
+.rensys-hero-meta span {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255,255,255,0.75);
+}
+
+.rensys-hero-meta b {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green-bright);
+  margin-right: 6px;
+}
+
+@media (max-width: 768px) {
+  .rensys-hero {
+    width: calc(100vw - 32px);
+    margin-left: calc(50% - 50vw + 16px);
+    min-height: 100vh;
+  }
+  .rensys-hero-inner { padding: 120px 0 80px; width: min(100% - 48px, 100%); }
+  .rensys-hero-title { font-size: clamp(36px, 10vw, 56px); margin-bottom: 20px !important; }
+  .rensys-hero-sub { font-size: 16px; margin-bottom: 28px; }
+  .rensys-hero-cta { flex-direction: column; gap: 12px; margin-bottom: 32px; }
+  .rensys-hero-btn, .rensys-hero-ghostbtn { width: 100%; padding: 14px 20px; font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rensys-hero-btn:hover, .rensys-hero-ghostbtn:hover { transform: none !important; }
+}
+</style>
+
+<!-- ═══════════ RENWAVES · RENSYS · HERO ═══════════ -->
+<section class="rensys-hero">
+
+  <!-- Image slot: empty on purpose. Set the image in rensys-hero.css (--rensys-hero-image). -->
+  <div class="rensys-hero-bg" aria-hidden="true"></div>
+  <div class="rensys-hero-scrim" aria-hidden="true"></div>
+
+  <div class="rensys-hero-inner">
+    <div class="rensys-hero-copy">
+      <span class="rensys-hero-eyebrow">Rensys · Free PV Simulator</span>
+      <h1 class="rensys-hero-title">
+        <span class="rensys-hero-ghost">Free Solar PV</span><br>
+        Yield Simulator<br>
+        <span class="rensys-hero-accent">&amp; Calculator</span>
+      </h1>
+      <p class="rensys-hero-sub">Rensys is a free solar PV simulator and calculator. Pick a location, set your system size, tilt, and orientation, and get annual yield, specific production, and a monthly profile in seconds. Built on real irradiance data and engineer-checked formulas. Free to use, and if you need a full design, leave it to us.</p>
+
+      <div class="rensys-hero-cta">
+        <a class="rensys-hero-btn" href="#rensys-tool" target="_self" rel="nofollow" onclick="event.preventDefault();var t=document.getElementById('rensys-tool')||document.querySelector('.rensys-wrapper');if(t){t.scrollIntoView({behavior:'smooth',block:'start'});}return false;">[ &gt; Run the simulation ]</a>
+        <a class="rensys-hero-ghostbtn" href="/pv-system-design/">Request a full design</a>
+        <a class="rensys-hero-ghostbtn" href="/rensys/docs/">Help &amp; Documentation</a>
+      </div>
+
+      <div class="rensys-hero-meta">
+        <span><b>±15–20%</b> Quick estimate</span>
+        <span><b>120+</b> Projects</span>
+        <span><b>14</b> Countries</span>
+        <span><b>Free</b> To use</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<style data-wp-block-html="css">
+/* ==========================================
+   RENSYS TOOL, Renwaves brand style
+   Brand: green #5FA63A / hover #6DBE45 · dark #1f2937
+   ========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+.rensys-wrapper {
+  --rs-primary: #5FA63A;
+  --rs-primary-hover: #6DBE45;
+  --rs-primary-deep: #4C8A2C;
+  --rs-bright: #8CE05B;
+  --rs-line: rgba(95, 166, 58, 0.35);
+  --rs-dark: #1f2937;
+  --rs-navy: #030f23;
+  --rs-bg: #ffffff;
+  --rs-surface: #f7f8f5;
+  --rs-border: #e2e8e0;
+  --rs-text: #1f2937;
+  --rs-muted: #6b7280;
+  --sans: 'Inter', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  background-color: var(--rs-bg);
+  color: var(--rs-text);
+  font-family: var(--sans);
+  padding: 28px;
+  border-radius: 20px;
+  border: 1px solid var(--rs-border);
+  box-shadow: 0 16px 48px rgba(31, 41, 55, 0.08);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.rensys-wrapper *, .rensys-wrapper *::before, .rensys-wrapper *::after { box-sizing: border-box; }
+
+.rensys-header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--rs-border);
+  padding-bottom: 16px;
+}
+
+.rensys-brand { display: flex; align-items: center; gap: 12px; }
+
+.rensys-logo-icon {
+  font-size: 22px;
+  background: var(--rs-surface);
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid var(--rs-line);
+}
+
+.rensys-brand h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--rs-dark);
+}
+
+.rensys-brand .badge {
+  background: rgba(95, 166, 58, 0.15);
+  color: var(--rs-primary-deep);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--rs-line);
+  vertical-align: middle;
+}
+
+.rensys-subtitle { margin: 6px 0 0 0; color: var(--rs-muted); font-size: 14px; }
+
+/* Keep the tool introduction compact rather than stretching across the page. */
+.rensys-header > p:not(.rensys-subtitle) {
+  max-width: 680px;
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--rs-muted);
+}
+
+@media (max-width: 600px) {
+  .rensys-header > p:not(.rensys-subtitle) { max-width: 100%; }
+}
+
+.rensys-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; }
+
+@media (max-width: 900px) {
+  .rensys-grid { grid-template-columns: 1fr; }
+  .rensys-wrapper { padding: 20px; }
+}
+
+.rensys-card {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.rensys-card h2, .rensys-card h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rs-primary-deep);
+}
+
+.rensys-card-stack { display: flex; flex-direction: column; gap: 24px; }
+
+.rensys-input-group { margin-bottom: 16px; }
+
+.rensys-input-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--rs-text);
+  margin-bottom: 6px;
+}
+
+.rensys-input-group label span {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--rs-primary-deep);
+}
+
+.rensys-input-group input[type="range"] {
+  width: 100%;
+  accent-color: var(--rs-primary);
+  cursor: pointer;
+}
+
+.rensys-input-group select,
+.rensys-text {
+  width: 100%;
+  background: #ffffff;
+  color: var(--rs-text);
+  border: 1px solid var(--rs-border);
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: var(--sans);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rensys-input-group select:focus,
+.rensys-text:focus {
+  border-color: var(--rs-primary);
+  box-shadow: 0 0 0 3px rgba(95, 166, 58, 0.2);
+}
+
+.rensys-row { display: flex; align-items: stretch; gap: 8px; margin-bottom: 8px; width: 100%; }
+
+.rensys-row .rensys-text { flex: 1 1 auto; min-width: 0; }
+.rensys-row #btn-search { flex: 0 0 auto; width: auto; min-width: 96px; max-width: 100%; white-space: nowrap; padding: 11px 16px; margin: 0; line-height: 1.2; }
+
+@media (max-width: 420px) {
+  .rensys-row { gap: 6px; }
+  .rensys-row #btn-search { min-width: 44px; padding: 11px 12px; font-size: 0; }
+  .rensys-row #btn-search::before { content: "⌕"; font-size: 22px; line-height: 1; }
+}
+
+.rensys-hint { margin: 8px 0 0 0; font-size: 12px; color: var(--rs-muted); line-height: 1.5; }
+.rensys-hint.ok { color: var(--rs-primary-deep); }
+.rensys-hint.error { color: #b42318; }
+
+/* Buttons: pill style like the homepage */
+.rensys-btn {
+  width: 100%;
+  background: var(--rs-primary);
+  color: #ffffff;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--rs-primary);
+  padding: 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  margin-top: 8px;
+  box-shadow: 0 12px 32px rgba(95, 166, 58, 0.3);
+  transition: all 0.3s ease;
+}
+
+.rensys-btn:hover {
+  background: var(--rs-primary-hover);
+  border-color: var(--rs-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(95, 166, 58, 0.4);
+}
+
+.rensys-btn-small { width: auto; margin-top: 0; padding: 10px 20px; font-size: 14px; box-shadow: none; }
+
+.rensys-btn-outline {
+  background: transparent;
+  color: var(--rs-primary-deep);
+  margin-top: 0;
+  padding: 10px;
+  font-size: 14px;
+  box-shadow: none;
+}
+
+.rensys-btn-outline:hover { background: var(--rs-primary); color: #ffffff; box-shadow: none; }
+
+.rensys-btn:disabled { opacity: 0.6; cursor: wait; transform: none; }
+
+/* KPIs */
+.rensys-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+@media (max-width: 600px) { .rensys-kpi-grid { grid-template-columns: 1fr; } }
+
+.rensys-kpi {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-line);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kpi-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rs-primary-deep);
+}
+
+.kpi-value { font-family: var(--mono); font-size: 26px; font-weight: 700; color: var(--rs-dark); }
+.kpi-unit { font-family: var(--mono); font-size: 11px; color: var(--rs-muted); }
+
+.rensys-chart-container { position: relative; height: 260px; width: 100%; }
+
+/* Terminal */
+.rensys-terminal {
+  background: var(--rs-navy);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  overflow: hidden;
+  font-family: var(--mono);
+}
+
+.terminal-header {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.dot.red { background: #ef4444; }
+.dot.yellow { background: #f59e0b; }
+.dot.green { background: var(--rs-bright); }
+
+.terminal-title { margin-left: 8px; font-size: 11px; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.55); }
+
+.terminal-body {
+  padding: 12px;
+  font-size: 12px;
+  color: var(--rs-bright);
+  height: 90px;
+  overflow-y: auto;
+  line-height: 1.6;
+}
+</style>
+
+<script data-wp-block-html="js">
+// Load Chart.js if the page does not have it yet
+if (typeof Chart === 'undefined') {
+  const chartScript = document.createElement('script');
+  chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+  document.head.appendChild(chartScript);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const $ = (id) => document.getElementById(id);
+
+  const powerInput = $("input-power");
+  const tiltInput = $("input-tilt");
+  const azimuthInput = $("input-azimuth");
+  const invInput = $("input-inv");
+  const ghiInput = $("input-ghi");
+  const techSelect = $("input-tech");
+  const cityInput = $("input-city");
+  const btnSearch = $("btn-search");
+  const btnGeo = $("btn-geolocate");
+  const locationStatus = $("location-status");
+
+  const valPower = $("val-power");
+  const valTilt = $("val-tilt");
+  const valAzimuth = $("val-azimuth");
+  const valInv = $("val-inv");
+  const valGhi = $("val-ghi");
+
+  const kpiYield = $("kpi-yield");
+  const kpiSpecific = $("kpi-specific");
+  const kpiDaily = $("kpi-daily");
+  const kpiPr = $("kpi-pr");
+  const btnSimulate = $("btn-simulate");
+  const terminalLog = $("terminal-log");
+
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const MONTH_KEYS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  const DAYS = [31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+  // Default monthly shares (Northern Hemisphere). Replaced by real data once a location is loaded.
+  const DEFAULT_SHARES = [0.05, 0.07, 0.09, 0.11, 0.12, 0.13, 0.13, 0.11, 0.09, 0.06, 0.03, 0.01];
+
+  let monthlyShares = DEFAULT_SHARES.slice();
+  let latitude = 32; // fallback latitude for the tilt model
+  let chartInstance = null;
+
+  function brandColor() {
+    const wrapper = document.querySelector(".rensys-wrapper");
+    const c = getComputedStyle(wrapper).getPropertyValue("--rs-primary").trim();
+    return c || "#0e9f6e";
+  }
+
+  function logToTerminal(message) {
+    const timestamp = new Date().toTimeString().split(' ')[0];
+    terminalLog.innerHTML += `<br>[${timestamp}] ${message}`;
+    terminalLog.scrollTop = terminalLog.scrollHeight;
+  }
+
+  function setStatus(text, type) {
+    locationStatus.textContent = text;
+    locationStatus.className = "rensys-hint" + (type ? " " + type : "");
+  }
+
+  function optimalTilt(lat) {
+    // Common rule of thumb for fixed annual-optimum tilt
+    return Math.round(Math.min(60, 0.76 * Math.abs(lat) + 3.1));
+  }
+
+  function calculateSimulation() {
+    const P_nom = parseFloat(powerInput.value);
+    const tilt = parseFloat(tiltInput.value);
+    const azimuth = parseFloat(azimuthInput.value);
+    const eta_inv = parseFloat(invInput.value) / 100;
+    const ghi = parseFloat(ghiInput.value);
+    const tech = techSelect.value;
+
+    // Technology factor (temperature behaviour)
+    let techFactor = 1.0;
+    if (tech === 'mono') techFactor = 1.03;
+    if (tech === 'cdte') techFactor = 0.98;
+
+    // Orientation loss, relative to the optimum tilt for the chosen latitude
+    const tiltDiff = Math.abs(tilt - optimalTilt(latitude));
+    const orientationFactor = Math.max(0.7, 1 - tiltDiff * 0.002 - Math.abs(azimuth) * 0.0008);
+
+    // Performance ratio: base system losses, technology and inverter efficiency
+    const pr = Math.min(0.9, Math.max(0.65, 0.80 * techFactor * (eta_inv / 0.975)));
+
+    // Specific yield (kWh/kWp/yr) and total annual yield
+    const specificYield = ghi * orientationFactor * pr;
+    const totalAnnualYield = P_nom * specificYield;
+
+    kpiYield.textContent = Math.round(totalAnnualYield).toLocaleString();
+    if (kpiDaily) kpiDaily.textContent = (totalAnnualYield / 365).toFixed(1);
+    kpiPr.textContent = (pr * 100).toFixed(1);
+
+    const monthlyData = monthlyShares.map(s => Math.round(totalAnnualYield * s));
+    updateChart(monthlyData);
+    logToTerminal(`Simulated ${P_nom} kWp (${tech}): ${Math.round(totalAnnualYield).toLocaleString()} kWh/yr.`);
+  }
+
+  function initChart() {
+    const ctx = $('rensysMonthlyChart').getContext('2d');
+    chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: MONTHS,
+        datasets: [{
+          label: 'Energy (kWh)',
+          data: [500, 700, 1100, 1400, 1600, 1800, 1800, 1500, 1200, 800, 400, 300],
+          backgroundColor: brandColor(),
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: '#e5ece8' }, ticks: { color: '#6b7280' } },
+          y: { grid: { color: '#e5ece8' }, ticks: { color: '#6b7280' }, title: { display: true, text: 'kWh', color: '#6b7280' } }
+        }
+      }
+    });
+  }
+
+  function updateChart(data) {
+    if (chartInstance) {
+      chartInstance.data.datasets[0].data = data;
+      chartInstance.update();
+    }
+  }
+
+  // ---------- Location ----------
+
+  async function geocode(query) {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Geocoding failed");
+    const json = await res.json();
+    if (!json.results || !json.results.length) throw new Error("Location not found");
+    const r = json.results[0];
+    return { lat: r.latitude, lon: r.longitude, label: [r.name, r.admin1, r.country].filter(Boolean).join(", ") };
+  }
+
+  async function loadIrradiance(lat, lon, label) {
+    setStatus("Loading solar data...", "");
+    const url = "https://power.larc.nasa.gov/api/temporal/climatology/point" +
+      `?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=${lon.toFixed(3)}&latitude=${lat.toFixed(3)}&format=JSON`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Solar data request failed");
+    const json = await res.json();
+    const p = json.properties.parameter.ALLSKY_SFC_SW_DWN; // kWh/m2/day
+
+    const monthly = MONTH_KEYS.map((k, i) => p[k] * DAYS[i]); // kWh/m2/month
+    const annual = monthly.reduce((a, b) => a + b, 0);
+    if (!isFinite(annual) || annual <= 0) throw new Error("No solar data for this point");
+
+    monthlyShares = monthly.map(m => m / annual);
+    latitude = lat;
+
+    const ghi = Math.round(annual / 25) * 25;
+    ghiInput.value = ghi;
+    valGhi.textContent = ghi;
+
+    const tilt = optimalTilt(lat);
+    tiltInput.value = tilt;
+    valTilt.textContent = tilt;
+
+    setStatus(`${label} (${lat.toFixed(2)}, ${lon.toFixed(2)}). GHI ${ghi} kWh/m²/yr, tilt set to ${tilt}°.`, "ok");
+    logToTerminal(`Location: ${label}. Irradiance loaded from NASA POWER.`);
+    calculateSimulation();
+  }
+
+  async function handleSearch() {
+    const q = cityInput.value.trim();
+    if (!q) { setStatus("Type a city name first.", "error"); return; }
+    btnSearch.disabled = true;
+    try {
+      const loc = await geocode(q);
+      await loadIrradiance(loc.lat, loc.lon, loc.label);
+    } catch (err) {
+      setStatus(err.message + ". You can still set GHI manually.", "error");
+    } finally {
+      btnSearch.disabled = false;
+    }
+  }
+
+  function handleGeolocate() {
+    if (!navigator.geolocation) { setStatus("Geolocation is not supported by this browser.", "error"); return; }
+    btnGeo.disabled = true;
+    setStatus("Waiting for location permission...", "");
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          await loadIrradiance(pos.coords.latitude, pos.coords.longitude, "Your location");
+        } catch (err) {
+          setStatus(err.message + ". You can still set GHI manually.", "error");
+        } finally {
+          btnGeo.disabled = false;
+        }
+      },
+      () => {
+        setStatus("Location permission denied. Search for a city instead.", "error");
+        btnGeo.disabled = false;
+      },
+      { timeout: 10000 }
+    );
+  }
+
+  // ---------- Events ----------
+
+  powerInput.addEventListener("input", (e) => { valPower.textContent = parseFloat(e.target.value).toFixed(1); });
+  tiltInput.addEventListener("input", (e) => { valTilt.textContent = e.target.value; });
+  azimuthInput.addEventListener("input", (e) => { valAzimuth.textContent = e.target.value; });
+  invInput.addEventListener("input", (e) => { valInv.textContent = e.target.value; });
+  ghiInput.addEventListener("input", (e) => { valGhi.textContent = e.target.value; });
+
+  btnSimulate.addEventListener("click", calculateSimulation);
+  btnSearch.addEventListener("click", handleSearch);
+  btnGeo.addEventListener("click", handleGeolocate);
+  cityInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); handleSearch(); } });
+
+  // Wait for Chart.js, then start
+  (function waitForChart(tries) {
+    if (typeof Chart !== 'undefined') {
+      initChart();
+      calculateSimulation();
+    } else if (tries > 0) {
+      setTimeout(() => waitForChart(tries - 1), 100);
+    } else {
+      logToTerminal("Chart.js failed to load.");
+    }
+  })(50);
+});
+</script>
+
+<style>
+  .rensys-intro {
+    max-width: 600px;
+    margin: 18px auto 28px;
+    text-align: left;
+    line-height: 1.6;
+  }
+
+  .rensys-intro > p {
+    margin-bottom: 12px;
+  }
+
+  .rensys-features {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 24px;
+    padding-left: 20px;
+    margin: 0;
+  }
+
+  .rensys-features li {
+    padding-left: 2px;
+  }
+
+  @media (max-width: 600px) {
+    .rensys-features {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+</style>
+
+<div class="rensys-wrapper">
+  <header class="rensys-header">
+    <div class="rensys-brand">
+      <span class="rensys-logo-icon">⚡</span>
+      <h2 class="rensys-tool-heading">Rensys <span class="badge">v1.1</span></h2>
+    </div>
+
+    <p class="rensys-subtitle">
+      Free solar PV calculator and photovoltaic system simulation by Renwaves
+    </p>
+
+ 
+      <p>
+        Rensys is a free, browser-based PV simulator for estimating solar energy production and system performance.
+        
+      </p>
+
+  </header>
+
+  <div class="rensys-grid">
+
+    <!-- Left column: inputs -->
+    <div class="rensys-card">
+      <h2>Location</h2>
+
+      <div class="rensys-input-group">
+        <label for="input-city">City or address</label>
+
+        <div class="rensys-row">
+          <input type="text" id="input-city" class="rensys-text" placeholder="e.g. Tehran, Berlin, Dubai">
+
+          <button type="button" id="btn-search" class="rensys-btn rensys-btn-small">
+            Search
+          </button>
+        </div>
+
+        <button type="button" id="btn-geolocate" class="rensys-btn rensys-btn-outline">
+          Use my location
+        </button>
+
+        <p class="rensys-hint" id="location-status">
+          No location selected. Using default irradiance.
+        </p>
+      </div>
+
+      <h2>System Parameters</h2>
+
+      <div class="rensys-input-group">
+        <label for="input-power">
+          System peak power (Pnom):
+          <span id="val-power">10.0</span> kWp
+        </label>
+
+        <input type="range" id="input-power" min="1" max="100" step="0.5" value="10">
+      </div>
+
+      <div class="rensys-input-group">
+        <label for="input-tech">Module technology</label>
+
+        <select id="input-tech">
+          <option value="mono" selected="">Monocrystalline Silicon (PERC)</option>
+          <option value="poly">Polycrystalline Silicon</option>
+          <option value="cdte">Cadmium Telluride (CdTe)</option>
+        </select>
+      </div>
+
+      <div class="rensys-input-group">
+        <label for="input-tilt">
+          Array tilt angle:
+          <span id="val-tilt">30</span>°
+        </label>
+
+        <input type="range" id="input-tilt" min="0" max="90" step="1" value="30">
+      </div>
+
+      <div class="rensys-input-group">
+        <label for="input-azimuth">
+          Array azimuth:
+          <span id="val-azimuth">0</span>°
+          (0° = facing the equator)
+        </label>
+
+        <input type="range" id="input-azimuth" min="-90" max="90" step="5" value="0">
+      </div>
+
+      <div class="rensys-input-group">
+        <label for="input-inv">
+          Inverter efficiency:
+          <span id="val-inv">97.5</span>%
+        </label>
+
+        <input type="range" id="input-inv" min="90" max="99" step="0.5" value="97.5">
+      </div>
+
+      <div class="rensys-input-group">
+        <label for="input-ghi">
+          Global horizontal irradiance (GHI):
+          <span id="val-ghi">1750</span> kWh/m²/yr
+        </label>
+
+        <input type="range" id="input-ghi" min="500" max="2800" step="25" value="1750">
+      </div>
+
+      <button type="button" id="btn-simulate" class="rensys-btn">
+        <span>&gt; Run Simulation</span>
+      </button>
+    </div>
+
+    <!-- Right column: results -->
+    <div class="rensys-card-stack">
+
+      <div class="rensys-kpi-grid">
+        <div class="rensys-kpi">
+          <span class="kpi-label">Annual Yield</span>
+          <span class="kpi-value" id="kpi-yield">14,850</span>
+          <span class="kpi-unit">kWh/year</span>
+        </div>
+
+        <div class="rensys-kpi">
+          <span class="kpi-label">Average Daily Yield</span>
+          <span class="kpi-value" id="kpi-daily">39.3</span>
+          <span class="kpi-unit">kWh/day</span>
+        </div>
+
+        <div class="rensys-kpi">
+          <span class="kpi-label">Performance Ratio</span>
+          <span class="kpi-value" id="kpi-pr">81.2</span>
+          <span class="kpi-unit">%</span>
+        </div>
+      </div>
+
+      <div class="rensys-card">
+        <h3>Monthly Energy Production Profile</h3>
+
+        <div class="rensys-chart-container">
+          <canvas id="rensysMonthlyChart"></canvas>
+        </div>
+      </div>
+
+      <div class="rensys-terminal">
+        <div class="terminal-header">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="terminal-title">rensys-core log</span>
+        </div>
+
+        <div class="terminal-body" id="terminal-log">
+          Initializing Rensys simulation engine...<br>
+          Ready for user input.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<style>
+/* Rensys Features — scoped styles, independent from calculator and Why section */
+.rensys-features-section{--rf-green:#5FA63A;--rf-deep:#4C8A2C;--rf-ink:#1F2937;--rf-muted:#667085;--rf-line:#E2E8E0;--rf-surface:#F7F8F5;width:100%;max-width:1400px;margin:64px auto;padding:0 28px;font-family:'Inter',system-ui,sans-serif;box-sizing:border-box}
+.rensys-features-section *,.rensys-features-section *:before,.rensys-features-section *:after{box-sizing:border-box}
+.rensys-features-head{max-width:760px;margin:0 0 30px}
+.rensys-features-eyebrow{display:inline-block;margin-bottom:12px;padding:7px 13px;border:1px solid rgba(95,166,58,.3);border-radius:999px;background:rgba(95,166,58,.09);color:var(--rf-deep);font:700 11px/1.4 'JetBrains Mono',monospace;letter-spacing:.13em;text-transform:uppercase}
+.rensys-features-title{margin:0 0 12px!important;color:var(--rf-ink);font-size:clamp(30px,3.6vw,44px);line-height:1.12;font-weight:800;letter-spacing:-.035em}
+.rensys-features-lead{margin:0;max-width:680px;color:#596579;font-size:17px;line-height:1.7}
+.rensys-features-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.rensys-feature-card{position:relative;min-height:210px;padding:25px 24px;overflow:hidden;border:1px solid var(--rf-line);border-radius:16px;background:linear-gradient(145deg,#fff 0%,var(--rf-surface) 100%);box-shadow:0 10px 28px rgba(31,41,55,.045);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.rensys-feature-card:hover{transform:translateY(-4px);border-color:rgba(95,166,58,.5);box-shadow:0 18px 36px rgba(31,41,55,.09)}
+.rensys-feature-card:after{content:"";position:absolute;right:-34px;bottom:-48px;width:130px;height:130px;border:1px solid rgba(95,166,58,.12);border-radius:50%;box-shadow:0 0 0 16px rgba(95,166,58,.035),0 0 0 32px rgba(95,166,58,.025);pointer-events:none}
+.rensys-feature-icon{display:flex;align-items:center;justify-content:center;width:46px;height:46px;margin-bottom:20px;border:1px solid rgba(95,166,58,.25);border-radius:13px;background:#EDF5E7;color:var(--rf-deep);font-size:22px}
+.rensys-feature-card h3{margin:0 0 9px!important;color:var(--rf-ink);font-size:17px;line-height:1.35;font-weight:750}
+.rensys-feature-card p{margin:0;max-width:360px;color:var(--rf-muted);font-size:14px;line-height:1.7}
+@media(max-width:900px){.rensys-features-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.rensys-features-section{margin:46px auto;padding:0 16px}.rensys-features-grid{grid-template-columns:1fr;gap:12px}.rensys-feature-card{min-height:0;padding:22px}.rensys-features-lead{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.rensys-feature-card{transition:none}.rensys-feature-card:hover{transform:none}}
+</style>
+
+
+
+<section class="rensys-features-section" aria-labelledby="rensys-features-title">
+  <div class="rensys-features-head">
+    <span class="rensys-features-eyebrow">Built for quick PV analysis</span>
+    <h2 class="rensys-features-title" id="rensys-features-title">Features of the free Rensys solar PV calculator</h2>
+    <p class="rensys-features-lead">Explore the key factors behind a solar installation and turn location and system assumptions into a clear first estimate of energy production.</p>
+  </div>
+  <div class="rensys-features-grid">
+    <article class="rensys-feature-card"><div class="rensys-feature-icon" aria-hidden="true">⌖</div><h3>Location-Based Solar Data</h3><p>Search for a city or address to estimate solar potential using location-specific irradiance data.</p></article>
+    <article class="rensys-feature-card"><div class="rensys-feature-icon" aria-hidden="true">⚙</div><h3>Flexible System Parameters</h3><p>Adjust system capacity, module technology, panel tilt, azimuth, inverter efficiency, and irradiance assumptions.</p></article>
+    <article class="rensys-feature-card"><div class="rensys-feature-icon" aria-hidden="true">∑</div><h3>Fast Yield Calculations</h3><p>Estimate annual and average daily energy yield with a performance ratio based on the selected inputs.</p></article>
+    <article class="rensys-feature-card"><div class="rensys-feature-icon" aria-hidden="true">▥</div><h3>Monthly Production Profile</h3><p>Review an at-a-glance monthly energy profile to understand how production may vary through the year.</p></article>
+    <article class="rensys-feature-card"><div class="rensys-feature-icon" aria-hidden="true">⌘</div><h3>Instant Browser Workflow</h3><p>Run a simulation directly in your browser without installing desktop software or setting up a project.</p></article>
+    <article class="rensys-feature-card"><div class="rensys-feature-icon" aria-hidden="true">↗</div><h3>Clear, Practical Results</h3><p>Use the outputs for an initial feasibility check, then move to a detailed engineering design when needed.</p></article>
+  </div>
+</section>
+
+
+
+<style data-wp-block-html="css">
+/* Rensys "Why" section. Sits between the hero and the tool. */
+.rensys-why {
+  --rs-primary: #5FA63A;
+  --rs-primary-deep: #4C8A2C;
+  --rs-line: rgba(95, 166, 58, 0.35);
+  --rs-dark: #1f2937;
+  --rs-surface: #f7f8f5;
+  --rs-border: #e2e8e0;
+  --rs-muted: #6b7280;
+  --sans: 'Inter', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  width: 100%;
+  max-width: 1400px;
+  margin: 32px auto;
+  padding: 0 28px;
+  font-family: var(--sans);
+  box-sizing: border-box;
+}
+
+.rensys-why *, .rensys-why *::before, .rensys-why *::after { box-sizing: border-box; }
+
+.rensys-why-eyebrow {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rs-primary-deep);
+  margin-bottom: 10px;
+}
+
+.rensys-why h2 {
+  margin: 0 0 12px 0;
+  font-size: clamp(28px, 3.5vw, 40px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--rs-dark);
+}
+
+.rensys-why-lead {
+  margin: 0 0 28px 0;
+  max-width: 680px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: #374151;
+}
+
+.rensys-why-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .rensys-why { padding: 0 16px; }
+  .rensys-why-grid { grid-template-columns: 1fr; }
+}
+
+.rensys-why-benefits { display: flex; flex-direction: column; gap: 12px; }
+
+.rensys-why-item {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-left: 3px solid var(--rs-primary);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rensys-why-item strong { font-size: 15px; font-weight: 700; color: var(--rs-dark); }
+.rensys-why-item span { font-size: 14px; color: var(--rs-muted); line-height: 1.5; }
+
+.rensys-why-table-wrap {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 14px;
+  padding: 8px 8px 14px 8px;
+}
+
+.rensys-why-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+.rensys-why-table th {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 12px 14px;
+  color: var(--rs-muted);
+  border-bottom: 1px solid var(--rs-border);
+}
+
+.rensys-why-table th:nth-child(2) { color: var(--rs-primary-deep); }
+
+.rensys-why-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--rs-border);
+  color: var(--rs-dark);
+}
+
+.rensys-why-table tr:last-child td { border-bottom: none; }
+.rensys-why-table td:first-child { font-weight: 600; color: var(--rs-muted); }
+.rensys-why-table td:nth-child(2) { font-weight: 700; color: var(--rs-primary-deep); background: rgba(95, 166, 58, 0.08); }
+
+.rensys-why-note { margin: 10px 14px 0 14px; font-size: 11px; color: var(--rs-muted); line-height: 1.4; }
+</style>
+
+<section class="rensys-why">
+  <div class="rensys-why-inner">
+    <span class="rensys-why-eyebrow">Why Rensys</span>
+    <h2>Rensys vs PVsyst: a free alternative for quick estimates</h2>
+    <p class="rensys-why-lead">Rensys is built for the first step: a fast, free yield estimate. Full simulation software is for the final design. Start here, then go deeper when the numbers justify it.</p>
+
+    <div class="rensys-why-grid">
+
+      <div class="rensys-why-benefits">
+        <div class="rensys-why-item">
+          <strong>Instant results</strong>
+          <span>No install, no learning curve. Results in seconds.</span>
+        </div>
+        <div class="rensys-why-item">
+          <strong>Real irradiance data</strong>
+          <span>Search any location and get its solar profile.</span>
+        </div>
+        <div class="rensys-why-item">
+          <strong>Engineer-checked</strong>
+          <span>Formulas built and verified by our team.</span>
+        </div>
+      </div>
+
+      <div class="rensys-why-table-wrap">
+        <table class="rensys-why-table">
+          <thead>
+            <tr><th></th><th>Rensys</th><th>PVsyst</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Cost</td><td>Free</td><td>Paid license</td></tr>
+            <tr><td>Setup</td><td>None</td><td>Desktop install</td></tr>
+            <tr><td>Time</td><td>Seconds</td><td>Hours</td></tr>
+            <tr><td>Best for</td><td>Early estimate</td><td>Detailed design</td></tr>
+          </tbody>
+        </table>
+        <p class="rensys-why-note">PVsyst is a trademark of PVsyst SA. Comparison is for general guidance only.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+<style>
+.rensys-seo-panel{--rseo-green:#5FA63A;--rseo-green-deep:#4C8A2C;--rseo-ink:#182420;--rseo-muted:#627067;--rseo-line:#E0E7DA;width:min(1120px,calc(100% - 40px));margin:64px auto;padding:clamp(28px,5vw,56px);position:relative;overflow:hidden;isolation:isolate;border:1px solid var(--rseo-line);border-radius:24px;background:linear-gradient(135deg,#fbfdf9 0%,#f1f6ec 58%,#fff 100%);box-shadow:0 18px 55px rgba(24,36,32,.07);font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--rseo-ink);box-sizing:border-box}
+.rensys-seo-panel *{box-sizing:border-box}.rensys-seo-panel:before{content:"";position:absolute;z-index:-1;right:-90px;top:-110px;width:300px;height:300px;border:1px solid rgba(95,166,58,.17);border-radius:50%;box-shadow:0 0 0 24px rgba(95,166,58,.035),0 0 0 50px rgba(95,166,58,.025)}
+.rensys-seo-kicker{display:inline-flex;align-items:center;gap:9px;margin:0 0 18px;padding:8px 13px;border:1px solid rgba(95,166,58,.3);border-radius:999px;background:#edf5e7;color:#4C8A2C;font:700 11px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase}
+.rensys-seo-kicker:before{content:"";width:7px;height:7px;border-radius:50%;background:#5FA63A;box-shadow:0 0 0 4px rgba(95,166,58,.13)}
+.rensys-seo-panel h2{max-width:760px;margin:0 0 18px!important;padding:0!important;color:#182420;font-size:clamp(30px,4vw,46px);line-height:1.12;font-weight:800;letter-spacing:-.04em}.rensys-seo-panel h2 span{color:#4C8A2C}
+.rensys-seo-intro{max-width:760px;margin:0 0 28px!important;color:#627067;font-size:17px;line-height:1.8}.rensys-seo-details{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 26px}
+.rensys-seo-detail{min-width:0;padding:18px 18px 20px;border:1px solid #E0E7DA;border-radius:15px;background:rgba(255,255,255,.82)}.rensys-seo-detail b{display:block;margin:0 0 7px;color:#182420;font-size:14px;font-weight:750}.rensys-seo-detail p{margin:0!important;color:#627067;font-size:13px;line-height:1.65}
+.rensys-seo-links{display:flex;flex-wrap:wrap;gap:10px 18px;padding-top:22px;border-top:1px solid #E0E7DA;font-size:13px;line-height:1.6}.rensys-seo-links a{color:#4C8A2C;font-weight:700;text-decoration:none;border-bottom:1px solid rgba(76,138,44,.25);transition:color .2s,border-color .2s}.rensys-seo-links a:hover{color:#2f641d;border-color:currentColor}
+@media(max-width:760px){.rensys-seo-panel{width:calc(100% - 28px);margin:42px auto;padding:28px 22px;border-radius:18px}.rensys-seo-details{grid-template-columns:1fr}.rensys-seo-intro{font-size:15px}}@media(prefers-reduced-motion:reduce){.rensys-seo-links a{transition:none}}
+</style>
+<section class="rensys-seo-panel" aria-labelledby="rensys-seo-heading">
+  <span class="rensys-seo-kicker">Quick solar assessment · Rensys</span>
+  <h2 id="rensys-seo-heading">A free solar PV calculator for <span>quick yield estimates</span></h2>
+  <p class="rensys-seo-intro">Rensys is a free solar PV simulator that runs in your browser. Choose a location, enter your system size, tilt and azimuth, and estimate annual energy production in kWh alongside a monthly production profile. No installation or account is required.</p>
+  <div class="rensys-seo-details">
+    <article class="rensys-seo-detail"><b>Start with your location</b><p>Use local solar-resource data to get an initial picture of your site's production potential.</p></article>
+    <article class="rensys-seo-detail"><b>Adjust your system</b><p>Explore how capacity, panel orientation and other assumptions affect your estimated yield.</p></article>
+    <article class="rensys-seo-detail"><b>Plan your next step</b><p>Use the estimate for an early feasibility check before moving to a detailed PV design.</p></article>
+  </div>
+  <div class="rensys-seo-links"><a href="/how-many-solar-panels-do-i-need-for-my-home/">Solar panel sizing guide ↗</a><a href="/what-is-photovoltaics/">What is photovoltaics? ↗</a><a href="/homeowner-checklist-for-buying-solar-panels/">Homeowner solar checklist ↗</a><a href="/energy-system-prices/">Energy system prices ↗</a><a href="/pv-system-design/">PV system design ↗</a><a href="/rensys/docs/">Rensys documentation ↗</a></div>
+</section>
+
+
+
+<style>
+/* ═══════════ RENWAVES · RENSYS FAQ · scoped rensys-faq ═══════════ */
+.rensys-faq{
+  --rf-green:#5FA63A; --rf-green-deep:#4C8A2C;
+  --rf-tint:#EDF5E3; --rf-bg:#FCFDFB;
+  --rf-ink:#182420; --rf-ink2:#5F6F63; --rf-line:#E0E7DA;
+  --rf-mono:'JetBrains Mono',ui-monospace,monospace;
+  --rf-sans:'Inter',system-ui,-apple-system,sans-serif;
+
+  width:100vw; margin-left:calc(50% - 50vw);
+  padding:clamp(72px,9vw,110px) 24px;
+  background:var(--rf-bg);
+  font-family:var(--rf-sans);
+  box-sizing:border-box;
+}
+.rensys-faq *, .rensys-faq *::before, .rensys-faq *::after{ box-sizing:border-box; }
+.rensys-faq-inner{ max-width:860px; margin:0 auto; }
+
+/* Header */
+.rensys-faq-head{ text-align:center; margin-bottom:48px; }
+.rensys-faq-eyebrow{
+  display:inline-block; font-family:var(--rf-mono); font-size:.72rem; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:var(--rf-green-deep); background:var(--rf-tint);
+  border:1px solid rgba(95,166,58,.35); border-radius:999px; padding:8px 16px;
+}
+.rensys-faq-title{
+  margin:20px 0 0; font-weight:800; letter-spacing:-.02em; color:var(--rf-ink);
+  font-size:clamp(1.9rem,3.6vw,2.7rem); line-height:1.12;
+}
+.rensys-faq-title span{ color:var(--rf-green); }
+.rensys-faq-sub{ margin:14px auto 0; max-width:560px; color:var(--rf-ink2); font-size:1.02rem; line-height:1.65; }
+
+/* Accordion */
+.rensys-faq-list{ display:flex; flex-direction:column; gap:14px; }
+.rensys-faq-item{
+  background:#fff; border:1px solid var(--rf-line); border-radius:14px;
+  overflow:hidden; transition:border-color .3s, box-shadow .3s;
+}
+.rensys-faq-item[open]{
+  border-color:rgba(95,166,58,.45);
+  box-shadow:0 14px 32px rgba(24,36,32,.08);
+}
+.rensys-faq-item summary{
+  display:flex; align-items:center; gap:16px;
+  padding:18px 22px; cursor:pointer; list-style:none;
+  font-size:1rem; font-weight:700; color:var(--rf-ink);
+  transition:background .25s;
+}
+.rensys-faq-item summary::-webkit-details-marker{ display:none; }
+.rensys-faq-item summary:hover{ background:rgba(95,166,58,.05); }
+.rensys-faq-index{
+  font-family:var(--rf-mono); font-size:.72rem; font-weight:600;
+  color:rgba(95,166,58,.6); flex:none;
+}
+.rensys-faq-item summary i{
+  margin-left:auto; flex:none; position:relative; width:16px; height:16px;
+  transition:transform .3s;
+}
+.rensys-faq-item summary i::before,
+.rensys-faq-item summary i::after{
+  content:""; position:absolute; background:var(--rf-green-deep); border-radius:2px;
+}
+.rensys-faq-item summary i::before{ left:7px; top:0; width:2px; height:16px; }
+.rensys-faq-item summary i::after{ left:0; top:7px; width:16px; height:2px; }
+.rensys-faq-item[open] summary i{ transform:rotate(45deg); }
+
+.rensys-faq-item p{
+  margin:0; padding:0 22px 20px 60px;
+  font-size:.92rem; line-height:1.7; color:var(--rf-ink2);
+}
+.rensys-faq-item p a{ color:var(--rf-green-deep); font-weight:600; }
+
+@media (max-width:640px){
+  .rensys-faq-item p{ padding-left:22px; }
+}
+</style>
+
+<section class="rensys-faq" id="rensys-faq">
+  <div class="rensys-faq-inner">
+
+    <header class="rensys-faq-head">
+      <span class="rensys-faq-eyebrow">FAQ</span>
+      <h2 class="rensys-faq-title">Rensys, <span>answered</span></h2>
+      <p class="rensys-faq-sub">Quick answers about how the simulator works and what it can and cannot do.</p>
+    </header>
+
+    <div class="rensys-faq-list">
+
+      <details class="rensys-faq-item">
+        <summary><span class="rensys-faq-index">01</span>How accurate is the Rensys solar PV calculator?<i></i></summary>
+        <p>Rensys is a screening tool, so expect roughly ±15 to 20%. It uses long-term average irradiance and a simplified loss model. A full design replaces those assumptions with your real site data and reaches ±6% model accuracy.</p>
+      </details>
+
+      <details class="rensys-faq-item">
+        <summary><span class="rensys-faq-index">02</span>Where does the solar data come from?<i></i></summary>
+        <p>When you search a location, Rensys pulls long-term average irradiance for that point from NASA POWER. The monthly profile in the chart follows the same data. You can also type your own irradiance value if you have a more local source.</p>
+      </details>
+
+      <details class="rensys-faq-item">
+        <summary><span class="rensys-faq-index">03</span>What do tilt and azimuth change?<i></i></summary>
+        <p>They set how much sunlight your panels catch. Rensys picks a tilt close to the yearly optimum for your latitude. An azimuth of 0° means the array faces the equator, which is south in the northern hemisphere and north in the southern.</p>
+      </details>
+
+      <details class="rensys-faq-item">
+        <summary><span class="rensys-faq-index">04</span>What does Rensys leave out?<i></i></summary>
+        <p>It does not model shading, soiling, hourly weather, or panel degradation separately. Temperature effects are covered by the module technology factor and a fixed performance ratio. For shaded or complex roofs, a full design is the safer route.</p>
+      </details>
+
+      <details class="rensys-faq-item">
+        <summary><span class="rensys-faq-index">05</span>Is the Rensys PV simulator free, and is my data saved?<i></i></summary>
+        <p>It is free to use. The calculator runs in your browser and does not save your inputs. Location searches are sent to third-party services (Open-Meteo and NASA POWER) to return coordinates and solar data.</p>
+      </details>
+
+      <details class="rensys-faq-item">
+        <summary><span class="rensys-faq-index">06</span>Can I use the results for permits or financing?<i></i></summary>
+        <p>No. Rensys is meant for early estimates only. Permits, bank loans, and installer quotes need a full design with a shading model, stringing, and a single-line diagram. You can <a href="/pv-system-design/">request a full PV system design</a> from our engineers.</p>
+      </details>
+
+    </div>
+
+  </div>
+</section>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How accurate is the Rensys solar PV calculator?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Rensys is a screening tool, so expect roughly ±15 to 20%. It uses long-term average irradiance and a simplified loss model. A full design replaces those assumptions with your real site data and reaches ±6% model accuracy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where does the solar data come from?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "When you search a location, Rensys pulls long-term average irradiance for that point from NASA POWER. The monthly profile in the chart follows the same data. You can also type your own irradiance value if you have a more local source."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What do tilt and azimuth change?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "They set how much sunlight your panels catch. Rensys picks a tilt close to the yearly optimum for your latitude. An azimuth of 0° means the array faces the equator, which is south in the northern hemisphere and north in the southern."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does Rensys leave out?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It does not model shading, soiling, hourly weather, or panel degradation separately. Temperature effects are covered by the module technology factor and a fixed performance ratio. For shaded or complex roofs, a full design is the safer route."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the Rensys PV simulator free, and is my data saved?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It is free to use. The calculator runs in your browser and does not save your inputs. Location searches are sent to third-party services (Open-Meteo and NASA POWER) to return coordinates and solar data."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use the results for permits or financing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Rensys is meant for early estimates only. Permits, bank loans, and installer quotes need a full design with a shading model, stringing, and a single-line diagram."
+      }
+    }
+  ]
+}
+</script>
+</body>
+</html>
