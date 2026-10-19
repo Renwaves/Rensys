@@ -37,4 +37,6 @@ No changes have been made to the live Renwaves site by creating this repository 
 
 ## License
 
-No license has been declared in this snapshot. Add a license file only after choosing the intended reuse and distribution terms.
+Rensys is licensed under the [Apache License 2.0](LICENSE) (`Apache-2.0`).
+
+Copyright 2026 renwaves.com.
